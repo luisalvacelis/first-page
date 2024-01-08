@@ -26,6 +26,20 @@ function typeAttack(value) {
   return attack;
 }
 
+function changeDisplay(label, status) {
+  var element = document.getElementById(label);
+  if (element) {
+    element.style.display = status;
+  }
+}
+
+function changeStatusVisible(label, status) {
+  let element = document.getElementById(label);
+  if (element) {
+    element.disabled = status;
+  }
+}
+
 function petSelected(numberPet) {
   let pet = "";
   switch (numberPet) {
@@ -66,12 +80,6 @@ function random(min, max) {
 }
 
 function selectPetPlayer() {
-  let sectionPet = document.getElementById("select-pet");
-  sectionPet.style.display = "none";
-
-  let sectionAttack = document.getElementById("select-attack");
-  sectionAttack.style.display = "block";
-
   let inputHipodoge = document.getElementById("hipodoge");
   let inputCapipepo = document.getElementById("capipepo");
   let inputRatigueya = document.getElementById("ratigueya");
@@ -83,21 +91,33 @@ function selectPetPlayer() {
   if (inputHipodoge.checked) {
     petPlayer.innerHTML = petSelected(1);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else if (inputCapipepo.checked) {
     petPlayer.innerHTML = petSelected(2);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else if (inputRatigueya.checked) {
     petPlayer.innerHTML = petSelected(3);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else if (inputLangostelvis.checked) {
     petPlayer.innerHTML = petSelected(4);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else if (inputTucapalma.checked) {
     petPlayer.innerHTML = petSelected(5);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else if (inputPydos.checked) {
     petPlayer.innerHTML = petSelected(6);
     selectPetEnemy();
+    changeDisplay("select-attack", "block");
+    changeDisplay("select-pet", "none");
   } else {
     alert("Error: No seleccionaste a tú mascota.");
   }
@@ -143,9 +163,11 @@ function resultCombat() {
     if (lifesEnemy == 0) {
       result = "ganaste";
       createMessage(2, result);
+      createMessage(3, "Juego finalizado");
     } else if (lifesPlayer == 0) {
       result = "perdiste";
       createMessage(2, result);
+      createMessage(3, "Juego finalizado");
     }
   }
   spanLifesEnemy.innerHTML = lifesEnemy;
@@ -174,6 +196,10 @@ function createMessage(typeMessage, result) {
       } else {
         paragraph.innerHTML = "Sin resultados 🤷‍♂️";
       }
+      changeStatusVisible("btn-fire-attack", true);
+      changeStatusVisible("btn-water-attack", true);
+      changeStatusVisible("btn-earth-attack", true);
+      changeDisplay("reset-game", "block");
       break;
     }
     case 3: {
@@ -185,8 +211,8 @@ function createMessage(typeMessage, result) {
 }
 
 function startGame() {
-  let sectionAttack = document.getElementById("select-attack");
-  sectionAttack.style.display = "none";
+  changeDisplay("select-attack", "none");
+  changeDisplay("reset-game", "none");
 
   let btnPetPlayer = document.getElementById("btn-select-pet");
   btnPetPlayer.addEventListener("click", selectPetPlayer);
@@ -201,6 +227,7 @@ function startGame() {
       createMessage(3, "Error: Mascota no seleccionada!");
     }
   });
+
   let btnWater = document.getElementById("btn-water-attack");
   btnWater.addEventListener("click", () => {
     if (document.getElementById("pet-player").innerText != "") {
@@ -211,6 +238,7 @@ function startGame() {
       createMessage(3, "Error: Mascota no seleccionada!");
     }
   });
+
   let btnEarth = document.getElementById("btn-earth-attack");
   btnEarth.addEventListener("click", () => {
     if (document.getElementById("pet-player").innerText != "") {
@@ -221,6 +249,7 @@ function startGame() {
       createMessage(3, "Error: Mascota no seleccionada!");
     }
   });
+
   let btnReset = document.getElementById("btn-reset-game");
   btnReset.addEventListener("click", () => {
     location.reload();
