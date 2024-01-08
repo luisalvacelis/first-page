@@ -1,59 +1,61 @@
 const start_game = document.querySelector("#start_game");
 
-function aleatorio(min,max){
-    return Math.floor(Math.random()*(max-min+1)+1);
+function selectionRandom(min,max){
+    return Math.floor(Math.random()*(max-min+1)+1) + "";
 }
-start_game.addEventListener("click", () => {
-    let min=1;
-    let max=3;
-    let website=aleatorio(min,max);
-    let player=0;
-    player=prompt("Elije: 1 para piedra, 2 para papel o 3 para tijera");
-    switch(player){
+
+function selection(move){
+    let result="";
+    switch(move){
         case "1":{
-            alert("Escojiste piedra");
+            result="piedra";
             break;
         }
         case "2":{
-            alert("Escojiste papel");
+            result="papel";
             break;
         }
         case "3":{
-            alert("Escojiste tijera");
+            result="tijera";
             break;
         }
         default: {
-            alert("Elegiste PERDER!!!");
+            result="PERDER!!!";
         }
     }
+    return result;
+}
 
-    switch(website){
-        case 1:{
-            alert("Website eligió piedra");
-            break;
-        }
-        case 2:{
-            alert("Website eligió papel");
-            break;
-        }
-        case 3:{
-            alert("Website eligió tijera");
-            break;
-        }
-        default: {
-            alert("Website eligió PERDER!!!");
-        }
-    }
+start_game.addEventListener("click", () => {
+    let min=1;
+    let max=3;
+    let player=0;
+    let website=0;
+    let wins=0;
+    let lose=0;
+    while(wins<3 && lose<3){
+        website=selectionRandom(min,max);
+        player=prompt("Elije: 1 para piedra, 2 para papel o 3 para tijera");
 
-    if(website==player){
-        alert("Empate!");
-    }else if(player==1 && website==3){
-        alert("Ganaste mi king con cara de kong!");
-    }else if(player==2 && website==1){
-        alert("Ganaste mi king con cara de kong!");
-    }else if(player==3 && website==2){
-        alert("Ganaste mi king con cara de kong!");
-    }else{
-        alert("Perdiste pipipi :(");
+        alert("Usted eligió: " + selection(player));
+        alert("Website eligió: " + selection(website));
+
+        if(website==player){
+            alert("Empate!");
+        }else if(player==1 && website==3){
+            alert("Ganaste mi king con cara de kong!");
+            wins++;
+        }else if(player==2 && website==1){
+            alert("Ganaste mi king con cara de kong!");
+            wins++;
+        }else if(player==3 && website==2){
+            alert("Ganaste mi king con cara de kong!");
+            wins++;
+        }else{
+            alert("Perdiste pipipi :(");
+            lose++;
+        }
+        
+        alert("Llevas " + wins + " ganadas y " + lose + " perdidas");
     }
   });
