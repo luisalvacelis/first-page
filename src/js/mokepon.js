@@ -76,20 +76,25 @@ function selectPetPlayer() {
 
   if (inputHipodoge.checked) {
     petPlayer.innerHTML = petSelected(1);
+    selectPetEnemy();
   } else if (inputCapipepo.checked) {
     petPlayer.innerHTML = petSelected(2);
+    selectPetEnemy();
   } else if (inputRatigueya.checked) {
     petPlayer.innerHTML = petSelected(3);
+    selectPetEnemy();
   } else if (inputLangostelvis.checked) {
     petPlayer.innerHTML = petSelected(4);
+    selectPetEnemy();
   } else if (inputTucapalma.checked) {
     petPlayer.innerHTML = petSelected(5);
+    vselectPetEnemy();
   } else if (inputPydos.checked) {
     petPlayer.innerHTML = petSelected(6);
+    selectPetEnemy();
   } else {
     alert("Error: No seleccionaste a tú mascota.");
   }
-  selectPetEnemy();
 }
 
 function selectPetEnemy() {
