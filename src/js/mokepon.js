@@ -66,6 +66,12 @@ function random(min, max) {
 }
 
 function selectPetPlayer() {
+  let sectionPet = document.getElementById("select-pet");
+  sectionPet.style.display = "none";
+
+  let sectionAttack = document.getElementById("select-attack");
+  sectionAttack.style.display = "block";
+
   let inputHipodoge = document.getElementById("hipodoge");
   let inputCapipepo = document.getElementById("capipepo");
   let inputRatigueya = document.getElementById("ratigueya");
@@ -88,7 +94,7 @@ function selectPetPlayer() {
     selectPetEnemy();
   } else if (inputTucapalma.checked) {
     petPlayer.innerHTML = petSelected(5);
-    vselectPetEnemy();
+    selectPetEnemy();
   } else if (inputPydos.checked) {
     petPlayer.innerHTML = petSelected(6);
     selectPetEnemy();
@@ -179,8 +185,8 @@ function createMessage(typeMessage, result) {
 }
 
 function startGame() {
-  let sectionSelectAttack = document.getElementById("select-attack");
-  sectionSelectAttack.style.display = "none";
+  let sectionAttack = document.getElementById("select-attack");
+  sectionAttack.style.display = "none";
 
   let btnPetPlayer = document.getElementById("btn-select-pet");
   btnPetPlayer.addEventListener("click", selectPetPlayer);
