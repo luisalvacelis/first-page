@@ -179,6 +179,9 @@ function createMessage(typeMessage, result) {
 }
 
 function startGame() {
+  let sectionSelectAttack = document.getElementById("select-attack");
+  sectionSelectAttack.style.display = "none";
+
   let btnPetPlayer = document.getElementById("btn-select-pet");
   btnPetPlayer.addEventListener("click", selectPetPlayer);
 
