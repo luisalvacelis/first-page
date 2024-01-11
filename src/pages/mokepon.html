@@ -4,53 +4,53 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mokepon</title>
-    <script src="../js/mokepon.js"></script>
+    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <h1>Mokepon 🔥💧🌎</h1>
-    <section id="select-pet">
-      <h2>Elige a tu mascota:</h2>
-      <label for="hipodoge">Hipodoge</label>
-      <input type="radio" name="pets" id="hipodoge" />
+    <div class="container">
+      <section id="select-pet" class="select-pet">
+        <h1 class="title">MOKEPON</h1>
+        <h2 class="sub-title">Elige a tu mascota:</h2>
 
-      <label for="capipepo">Capipepo</label>
-      <input type="radio" name="pets" id="capipepo" />
+        <div class="available-pets" id="container-available-pets"></div>
+        <button id="btn-select-pet">Seleccionar</button>
+      </section>
 
-      <label for="ratigueya">Ratigueya</label>
-      <input type="radio" name="pets" id="ratigueya" />
+      <section id="select-attack" class="select-attack">
+        <h1 class="title">MOKEPON</h1>
+        <h2 class="sub-title">Elige tu ataque:</h2>
 
-      <label for="langostelvis">Langostelvis</label>
-      <input type="radio" name="pets" id="langostelvis" />
+        <div class="btn-attacks" id="container-btn-attacks"></div>
 
-      <label for="tucapalma">Tucapalma</label>
-      <input type="radio" name="pets" id="tucapalma" />
+        <div class="console-reset">
+          <section class="console-result"><p id="console"></p></section>
 
-      <label for="pydos">Pydos</label>
-      <input type="radio" name="pets" id="pydos" />
+          <section id="reset-game">
+            <button id="btn-reset-game">Reiniciar ⏪</button>
+          </section>
+        </div>
 
-      <button id="btn-select-pet">Seleccionar</button>
-    </section>
-    <section id="select-attack">
-      <h2>Elige tu ataque:</h2>
+        <div class="current-pets">
+          <div class="pet-player">
+            <span id="wins-player" class="wins">0 👑</span>
+            <p class="pet">Tú: <span id="pet-player"></span></p>
+            <section id="console-player" class="section-consoles"></section>
+          </div>
 
-      <p>
-        Tú mascota <span id="pet-player"></span> tiene
-        <span id="lifes-player">3</span> 💓
-      </p>
-      <p>
-        La mascota <span id="pet-enemy"></span> del enemigo tiene
-        <span id="lifes-enemy">3</span> 💓
-      </p>
-      <p>
-        <button id="btn-fire-attack">Fuego 🔥</button>
-        <button id="btn-water-attack">Agua 💧</button>
-        <button id="btn-earth-attack">Tierra 🌍</button>
-      </p>
-    </section>
-    <section id="console"></section>
-
-    <section id="reset-game">
-      <button id="btn-reset-game">Reiniciar ⏪</button>
-    </section>
+          <div class="pet-enemy">
+            <span id="wins-enemy" class="wins">0 👑</span>
+            <p class="pet">Enemigo: <span id="pet-enemy"></span></p>
+            <section id="console-enemy" class="section-consoles"></section>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="../js/mokepon.js"></script>
   </body>
 </html>

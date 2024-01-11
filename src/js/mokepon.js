@@ -1,30 +1,83 @@
+const btnPetPlayer = document.getElementById("btn-select-pet");
+const btnFire = document.getElementById("btn-fire-attack");
+const btnWater = document.getElementById("btn-water-attack");
+const btnEarth = document.getElementById("btn-earth-attack");
+const btnReset = document.getElementById("btn-reset-game");
+
+const petPlayer = document.getElementById("pet-player");
+const petEnemy = document.getElementById("pet-enemy");
+
+const spanWinsPlayer = document.getElementById("wins-player");
+const spanWinsEnemy = document.getElementById("wins-enemy");
+
+const containerAvailablePets = document.getElementById(
+  "container-available-pets"
+);
+const containerBtnAttacks = document.getElementById("container-btn-attacks");
+
+let mokepones = [];
+let attacksPlayer = [];
+let attacksEnemy = [];
+let sequenceAttackPlayer = [];
+let sequenceAttackEnemy = [];
 let attackPlayer;
 let attackEnemy;
-let lifesPlayer = 3;
-let lifesEnemy = 3;
+let btnAttacks;
+let winPlayer = 0;
+let winEnemy = 0;
 
-function typeAttack(value) {
-  let attack = "";
-  switch (value) {
-    case 1: {
-      attack = "Fuego";
-      break;
-    }
-    case 2: {
-      attack = "Agua";
-      break;
-    }
-    case 3: {
-      attack = "Tierra";
-      break;
-    }
-    default: {
-      attack = "ATTACK NOT FOUND";
-      break;
-    }
+class Mokepon {
+  constructor(name, photo, life) {
+    this.name = name;
+    this.photo = photo;
+    this.life = life;
+    this.attacks = [];
   }
-  return attack;
 }
+
+let hipodoge = new Mokepon(
+  "Hipodoge",
+  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_hipodoge_attack.png",
+  5
+);
+
+let capipepo = new Mokepon(
+  "Capipepo",
+  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_capipepo_attack.png",
+  5
+);
+
+let ratigueya = new Mokepon(
+  "Ratigueya",
+  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_ratigueya_attack.png",
+  5
+);
+
+hipodoge.attacks.push(
+  { name: "💧", id: "btn-water-attack" },
+  { name: "💧", id: "btn-water-attack" },
+  { name: "💧", id: "btn-water-attack" },
+  { name: "🔥", id: "btn-fire-attack" },
+  { name: "🌱", id: "btn-earth-attack" }
+);
+
+capipepo.attacks.push(
+  { name: "🌱", id: "btn-earth-attack" },
+  { name: "🌱", id: "btn-earth-attack" },
+  { name: "🌱", id: "btn-earth-attack" },
+  { name: "💧", id: "btn-water-attack" },
+  { name: "🔥", id: "btn-fire-attack" }
+);
+
+ratigueya.attacks.push(
+  { name: "🔥", id: "btn-fire-attack" },
+  { name: "🔥", id: "btn-fire-attack" },
+  { name: "🔥", id: "btn-fire-attack" },
+  { name: "💧", id: "btn-water-attack" },
+  { name: "🌱", id: "btn-earth-attack" }
+);
+
+mokepones.push(hipodoge, capipepo, ratigueya);
 
 function changeDisplay(label, status) {
   var element = document.getElementById(label);
@@ -33,227 +86,212 @@ function changeDisplay(label, status) {
   }
 }
 
-function changeStatusVisible(label, status) {
-  let element = document.getElementById(label);
-  if (element) {
-    element.disabled = status;
-  }
+function desactiveAllButtonAttack() {
+  btnAttacks.forEach((button) => {
+    button.disabled = true;
+  });
 }
 
-function petSelected(numberPet) {
-  let pet = "";
-  switch (numberPet) {
-    case 1: {
-      pet = "Hipodoge";
-      break;
-    }
-    case 2: {
-      pet = "Capipepo";
-      break;
-    }
-    case 3: {
-      pet = "Ratigueya";
-      break;
-    }
-    case 4: {
-      pet = "Langotelvis";
-      break;
-    }
-    case 5: {
-      pet = "Tucapalma";
-      break;
-    }
-    case 6: {
-      pet = "Pydos";
-      break;
-    }
-    default: {
-      pet = "PET NO ENCONTRADA";
-      break;
-    }
-  }
-  return pet;
+function generalConsole(label, msg) {
+  let console = document.getElementById(label);
+  let paragraph = document.createElement("p");
+  paragraph.innerHTML = msg;
+  console.appendChild(paragraph);
+}
+
+function overwriteConsole(msg) {
+  let console = document.getElementById("console");
+  console.innerHTML = msg;
 }
 
 function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function selectPetPlayer() {
-  let inputHipodoge = document.getElementById("hipodoge");
-  let inputCapipepo = document.getElementById("capipepo");
-  let inputRatigueya = document.getElementById("ratigueya");
-  let inputLangostelvis = document.getElementById("langostelvis");
-  let inputTucapalma = document.getElementById("tucapalma");
-  let inputPydos = document.getElementById("pydos");
-  let petPlayer = document.getElementById("pet-player");
+function typeAttack(type, value) {
+  let result;
+  switch (type) {
+    case 1: {
+      result = attacksPlayer[value].name;
+      break;
+    }
+    case 2: {
+      result = attacksEnemy[value].name;
+      break;
+    }
+  }
+  return result;
+}
 
-  if (inputHipodoge.checked) {
-    petPlayer.innerHTML = petSelected(1);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
+function petSelected(type, number) {
+  switch (type) {
+    case 1: {
+      const selectedPetInput = document.querySelector(
+        'input[name="pets"]:checked'
+      );
+      if (selectedPetInput) {
+        return mokepones.find(
+          (mokepon) => mokepon.name === selectedPetInput.id
+        );
+      }
+      return null;
+    }
+    case 2: {
+      return mokepones[number];
+    }
+  }
+}
+
+function loadPets() {
+  mokepones.forEach((mokepon) => {
+    let mokeponOptions = `<input type="radio" name="pets" id="${mokepon.name}" />
+    <label class="card-mokepon" for="${mokepon.name}">
+      <p>${mokepon.name}</p>
+      <img src="${mokepon.photo}" alt="${mokepon.name}"/>
+    </label>`;
+    containerAvailablePets.innerHTML += mokeponOptions;
+  });
+}
+
+function selectPetPlayers() {
+  const selectPetPlayer = petSelected(1, 0);
+  const selectPetEnemy = petSelected(2, random(0, mokepones.length - 1));
+  if (selectPetPlayer) {
+    petPlayer.innerHTML = selectPetPlayer.name;
+    petEnemy.innerHTML = selectPetEnemy.name;
+
+    attacksPlayer = extractPetAttacks(selectPetPlayer.name);
+    attacksEnemy = extractPetAttacks(selectPetEnemy.name);
+
     changeDisplay("select-pet", "none");
-  } else if (inputCapipepo.checked) {
-    petPlayer.innerHTML = petSelected(2);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
-    changeDisplay("select-pet", "none");
-  } else if (inputRatigueya.checked) {
-    petPlayer.innerHTML = petSelected(3);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
-    changeDisplay("select-pet", "none");
-  } else if (inputLangostelvis.checked) {
-    petPlayer.innerHTML = petSelected(4);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
-    changeDisplay("select-pet", "none");
-  } else if (inputTucapalma.checked) {
-    petPlayer.innerHTML = petSelected(5);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
-    changeDisplay("select-pet", "none");
-  } else if (inputPydos.checked) {
-    petPlayer.innerHTML = petSelected(6);
-    selectPetEnemy();
-    changeDisplay("select-attack", "block");
-    changeDisplay("select-pet", "none");
+    changeDisplay("select-attack", "flex");
+
+    loadAttackPlayer();
+    playerAttackSequence();
   } else {
     alert("Error: No seleccionaste a tú mascota.");
   }
 }
 
-function selectPetEnemy() {
-  let attackRandomNumber = random(1, 6);
-  let petEnemySelected = petSelected(attackRandomNumber);
-  let petEnemy = document.getElementById("pet-enemy");
-  petEnemy.innerHTML = petEnemySelected;
+function extractPetAttacks(petName) {
+  let attacks;
+  for (let i = 0; i < mokepones.length; i++) {
+    if (petName === mokepones[i].name) {
+      attacks = mokepones[i].attacks;
+    }
+  }
+  return attacks;
+}
+
+function loadAttackPlayer() {
+  attacksPlayer.forEach((attack) => {
+    let attacksOptions = `<button id="${attack.id}" class="availables-attacks">${attack.name}</button>`;
+    containerBtnAttacks.innerHTML += attacksOptions;
+  });
+
+  btnAttacks = document.querySelectorAll(".availables-attacks");
+}
+
+function playerAttackSequence() {
+  btnAttacks.forEach((button) => {
+    button.addEventListener("click", (e) => {
+      if (e.target.textContent === "🔥") {
+        sequenceAttackPlayer.push("🔥");
+        button.style.background = "#82109A";
+        button.disabled = true;
+        attackPlayer = "🔥";
+      } else if (e.target.textContent === "💧") {
+        sequenceAttackPlayer.push("💧");
+        button.style.background = "#82109A";
+        button.disabled = true;
+        attackPlayer = "💧";
+      } else if (e.target.textContent === "🌱") {
+        sequenceAttackPlayer.push("🌱");
+        button.style.background = "#82109A";
+        button.disabled = true;
+        attackPlayer = "🌱";
+      }
+      enemyAttackSequence();
+      startCombat();
+    });
+  });
+}
+
+function enemyAttackSequence() {
+  let randomNumber = random(0, attacksEnemy.length - 1);
+  attackEnemy = typeAttack(2, randomNumber);
+  sequenceAttackEnemy.push(attackEnemy);
+}
+
+function startCombat() {
+  if (sequenceAttackPlayer.length === 5) {
+    resultCombat();
+  }
 }
 
 function resultCombat() {
-  let spanLifesPlayer = document.getElementById("lifes-player");
-  let spanLifesEnemy = document.getElementById("lifes-enemy");
+  for (let i = 0; i < sequenceAttackPlayer.length; i++) {
+    generalConsole("console-player", sequenceAttackPlayer[i]);
+    generalConsole("console-enemy", sequenceAttackEnemy[i]);
 
-  let result = "";
-  if (lifesEnemy == 0 || lifesPlayer == 0) {
-    createMessage(3, "Juego finalizado");
-  } else {
-    if (lifesEnemy > 0 && lifesPlayer > 0) {
-      if (attackEnemy == attackPlayer) {
-        result = "Empate! 🤷‍♂️";
-        createMessage(1, result);
-      } else if (attackPlayer == "Fuego" && attackEnemy == "Tierra") {
-        result = "Ganaste! 🎉";
-        lifesEnemy--;
-        createMessage(1, result);
-      } else if (attackPlayer == "Agua" && attackEnemy == "Fuego") {
-        result = "Ganaste! 🎉";
-        lifesEnemy--;
-        createMessage(1, result);
-      } else if (attackPlayer == "Tierra" && attackEnemy == "Agua") {
-        result = "Ganaste! 🎉";
-        lifesEnemy--;
-        createMessage(1, result);
-      } else {
-        result = "Perdiste! 😢";
-        lifesPlayer--;
-        createMessage(1, result);
-      }
+    if (sequenceAttackPlayer[i] === sequenceAttackEnemy[i]) {
+      overwriteConsole("Empate! 🤷‍♂️");
+    } else if (
+      sequenceAttackPlayer[i] == "🔥" &&
+      sequenceAttackEnemy[i] == "🌱"
+    ) {
+      winPlayer++;
+      overwriteConsole("Ganaste ronda 🎈🎉");
+    } else if (
+      sequenceAttackPlayer[i] == "💧" &&
+      sequenceAttackEnemy[i] == "🔥"
+    ) {
+      winPlayer++;
+      overwriteConsole("Ganaste ronda 🎈🎉");
+    } else if (
+      sequenceAttackPlayer[i] == "🌱" &&
+      sequenceAttackEnemy[i] == "💧"
+    ) {
+      winPlayer++;
+      overwriteConsole("Ganaste ronda 🎈🎉");
+    } else {
+      winEnemy++;
+      overwriteConsole("Perdiste ronda 😢");
     }
-    if (lifesEnemy == 0) {
-      result = "ganaste";
-      createMessage(2, result);
-      createMessage(3, "Juego finalizado");
-    } else if (lifesPlayer == 0) {
-      result = "perdiste";
-      createMessage(2, result);
-      createMessage(3, "Juego finalizado");
-    }
+    validateResultWin();
   }
-  spanLifesEnemy.innerHTML = lifesEnemy;
-  spanLifesPlayer.innerHTML = lifesPlayer;
 }
 
-function createMessage(typeMessage, result) {
-  let console = document.getElementById("console");
-  let paragraph = document.createElement("p");
-  switch (typeMessage) {
-    case 1: {
-      paragraph.innerHTML =
-        "Tú mascota atacó con " +
-        attackPlayer +
-        ", la mascota del enemigo atacó con " +
-        attackEnemy +
-        " - " +
-        result;
-      break;
-    }
-    case 2: {
-      if (result == "perdiste") {
-        paragraph.innerHTML = "Perdiste la partida 😢";
-      } else if (result == "ganaste") {
-        paragraph.innerHTML = "Ganaste la partida 😀🎉";
-      } else {
-        paragraph.innerHTML = "Sin resultados 🤷‍♂️";
-      }
-      changeStatusVisible("btn-fire-attack", true);
-      changeStatusVisible("btn-water-attack", true);
-      changeStatusVisible("btn-earth-attack", true);
-      changeDisplay("reset-game", "block");
-      break;
-    }
-    case 3: {
-      paragraph.innerHTML = result;
-      break;
-    }
+function validateResultWin() {
+  spanWinsEnemy.innerHTML = winEnemy + " 👑";
+  spanWinsPlayer.innerHTML = winPlayer + " 👑";
+  changeDisplay("reset-game", "flex");
+  desactiveAllButtonAttack();
+  if (winPlayer == winEnemy) {
+    overwriteConsole(
+      "¡La partida quedo en empate! 🎈🎉 <br>- - - Juego finalizado - - -"
+    );
+  } else if (winPlayer > winEnemy) {
+    overwriteConsole(
+      "¡Ganaste la partida! 🎈🎉 <br>- - - Juego finalizado - - -"
+    );
+  } else if (winPlayer < winEnemy) {
+    overwriteConsole(
+      "¡Perdiste la partida! 😭 <br>- - - Juego finalizado - - -"
+    );
   }
-  console.appendChild(paragraph);
 }
 
-function startGame() {
+function innitGame() {
   changeDisplay("select-attack", "none");
   changeDisplay("reset-game", "none");
+  loadPets();
 
-  let btnPetPlayer = document.getElementById("btn-select-pet");
-  btnPetPlayer.addEventListener("click", selectPetPlayer);
+  btnPetPlayer.addEventListener("click", selectPetPlayers);
 
-  let btnFire = document.getElementById("btn-fire-attack");
-  btnFire.addEventListener("click", () => {
-    if (document.getElementById("pet-player").innerText != "") {
-      attackPlayer = typeAttack(1);
-      attackEnemy = typeAttack(random(1, 3));
-      resultCombat();
-    } else {
-      createMessage(3, "Error: Mascota no seleccionada!");
-    }
-  });
-
-  let btnWater = document.getElementById("btn-water-attack");
-  btnWater.addEventListener("click", () => {
-    if (document.getElementById("pet-player").innerText != "") {
-      attackPlayer = typeAttack(2);
-      attackEnemy = typeAttack(random(1, 3));
-      resultCombat();
-    } else {
-      createMessage(3, "Error: Mascota no seleccionada!");
-    }
-  });
-
-  let btnEarth = document.getElementById("btn-earth-attack");
-  btnEarth.addEventListener("click", () => {
-    if (document.getElementById("pet-player").innerText != "") {
-      attackPlayer = typeAttack(3);
-      attackEnemy = typeAttack(random(1, 3));
-      resultCombat();
-    } else {
-      createMessage(3, "Error: Mascota no seleccionada!");
-    }
-  });
-
-  let btnReset = document.getElementById("btn-reset-game");
   btnReset.addEventListener("click", () => {
     location.reload();
   });
 }
 
-window.addEventListener("load", startGame);
+window.addEventListener("load", innitGame);
