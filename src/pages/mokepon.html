@@ -22,6 +22,17 @@
         <button id="btn-select-pet">Seleccionar</button>
       </section>
 
+      <section id="see-map" class="see-map">
+        <h2 class="sub-title">Recorre el mapa con tu mokepon</h2>
+        <canvas id="map"> </canvas>
+        <button onmousedown="moveUp();">W</button>
+        <div class="container-btn-move">
+          <button onmousedown="moveLeft();">A</button>
+          <button onmousedown="moveDown();">S</button>
+          <button onmousedown="moveRight();">D</button>
+        </div>
+      </section>
+
       <section id="select-attack" class="select-attack">
         <h1 class="title">MOKEPON</h1>
         <h2 class="sub-title">Elige tu ataque:</h2>
