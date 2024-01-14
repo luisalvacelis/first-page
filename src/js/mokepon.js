@@ -18,11 +18,12 @@ const containerBtnAttacks = document.getElementById("container-btn-attacks");
 const sectionSeeMap = document.getElementById("see-map");
 const map = document.getElementById("map");
 
+let playerID = null;
+let enemyID = null;
 let mokeponesPlayer = [];
 let mokeponesEnemy = [];
 let currentPet;
 let attacksPlayer = [];
-let attacksEnemy = [];
 let sequenceAttackPlayer = [];
 let sequenceAttackEnemy = [];
 let keysPressed = {};
@@ -48,7 +49,8 @@ map.width = widthMap;
 map.height = heightToSearch;
 
 class Mokepon {
-  constructor(name, photo, life, mapPhoto) {
+  constructor(name, photo, life, mapPhoto, id = null) {
+    this.id = id;
     this.name = name;
     this.photo = photo;
     this.life = life;
@@ -89,77 +91,35 @@ let ratigueya = new Mokepon(
   "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/ratigueya.png"
 );
 
-let hipodogeEnemy = new Mokepon(
-  "Hipodoge",
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_hipodoge_attack.png",
-  5,
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/hipodoge.png"
-);
-
-let capipepoEnemy = new Mokepon(
-  "Capipepo",
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_capipepo_attack.png",
-  5,
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/capipepo.png"
-);
-
-let ratigueyaEnemy = new Mokepon(
-  "Ratigueya",
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_ratigueya_attack.png",
-  5,
-  "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/ratigueya.png"
-);
-
-hipodoge.attacks.push(
+const HIPODOGE_ATTACKS = [
   { name: "💧", id: "btn-water-attack" },
   { name: "💧", id: "btn-water-attack" },
   { name: "💧", id: "btn-water-attack" },
   { name: "🔥", id: "btn-fire-attack" },
-  { name: "🌱", id: "btn-earth-attack" }
-);
+  { name: "🌱", id: "btn-earth-attack" },
+];
 
-capipepo.attacks.push(
+const CAPIPEPO_ATTACKS = [
   { name: "🌱", id: "btn-earth-attack" },
   { name: "🌱", id: "btn-earth-attack" },
   { name: "🌱", id: "btn-earth-attack" },
   { name: "💧", id: "btn-water-attack" },
-  { name: "🔥", id: "btn-fire-attack" }
-);
+  { name: "🔥", id: "btn-fire-attack" },
+];
 
-ratigueya.attacks.push(
+const RATIGUEYA_ATTACKS = [
   { name: "🔥", id: "btn-fire-attack" },
   { name: "🔥", id: "btn-fire-attack" },
   { name: "🔥", id: "btn-fire-attack" },
   { name: "💧", id: "btn-water-attack" },
-  { name: "🌱", id: "btn-earth-attack" }
-);
-
-hipodogeEnemy.attacks.push(
-  { name: "💧", id: "btn-water-attack" },
-  { name: "💧", id: "btn-water-attack" },
-  { name: "💧", id: "btn-water-attack" },
-  { name: "🔥", id: "btn-fire-attack" },
-  { name: "🌱", id: "btn-earth-attack" }
-);
-
-capipepoEnemy.attacks.push(
   { name: "🌱", id: "btn-earth-attack" },
-  { name: "🌱", id: "btn-earth-attack" },
-  { name: "🌱", id: "btn-earth-attack" },
-  { name: "💧", id: "btn-water-attack" },
-  { name: "🔥", id: "btn-fire-attack" }
-);
+];
 
-ratigueyaEnemy.attacks.push(
-  { name: "🔥", id: "btn-fire-attack" },
-  { name: "🔥", id: "btn-fire-attack" },
-  { name: "🔥", id: "btn-fire-attack" },
-  { name: "💧", id: "btn-water-attack" },
-  { name: "🌱", id: "btn-earth-attack" }
-);
+capipepo.attacks.push(...CAPIPEPO_ATTACKS);
+ratigueya.attacks.push(...RATIGUEYA_ATTACKS);
+hipodoge.attacks.push(...HIPODOGE_ATTACKS);
 
 mokeponesPlayer.push(hipodoge, capipepo, ratigueya);
-mokeponesEnemy.push(hipodogeEnemy, capipepoEnemy, ratigueyaEnemy);
 
 function changeDisplay(label, status) {
   var element = document.getElementById(label);
@@ -190,95 +150,23 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function typeAttack(type, value) {
-  let result;
-  switch (type) {
-    case 1: {
-      result = attacksPlayer[value].name;
-      break;
-    }
-    case 2: {
-      result = attacksEnemy[value].name;
-      break;
-    }
-  }
-  return result;
-}
-
-function petSelected(type, number) {
-  switch (type) {
-    case 1: {
-      const selectedPetInput = document.querySelector(
-        'input[name="pets"]:checked'
-      );
-      if (selectedPetInput) {
-        return mokeponesPlayer.find(
-          (mokepon) => mokepon.name === selectedPetInput.id
-        );
-      }
-      return null;
-    }
-    case 2: {
-      return mokeponesEnemy[number];
-    }
+function petSelected() {
+  const selectedPetInput = document.querySelector('input[name="pets"]:checked');
+  if (selectedPetInput) {
+    return mokeponesPlayer.find(
+      (mokepon) => mokepon.name === selectedPetInput.id
+    );
   }
 }
 
-function loadPetPlayer() {
-  mokeponesPlayer.forEach((mokepon) => {
-    let mokeponOptions = `<input type="radio" name="pets" id="${mokepon.name}" />
-    <label class="card-mokepon" for="${mokepon.name}">
-      <p>${mokepon.name}</p>
-      <img src="${mokepon.photo}" alt="${mokepon.name}"/>
-    </label>`;
-    containerAvailablePets.innerHTML += mokeponOptions;
-  });
-}
-
-function selectPetPlayer() {
-  const petSelectedPlayer = petSelected(1, 0);
-  if (petSelectedPlayer) {
-    petPlayer.innerHTML = petSelectedPlayer.name;
-    currentPet = petSelectedPlayer;
-    attacksPlayer = extractPetAttacks(1, petSelectedPlayer.name);
-
-    changeDisplay("select-pet", "none");
-    changeDisplay("see-map", "flex");
-    innitMap();
-
-    loadAttackPlayer();
-    playerAttackSequence();
-  } else {
-    alert("Error: No seleccionaste a tú mascota.");
-  }
-}
-
-function innitMap() {
-  interval = setInterval(drawCanvas, 50);
-
-  document.addEventListener("keydown", handleKeyDown);
-
-  document.addEventListener("keyup", handleKeyUp);
-}
-
-function drawCanvas() {
-  currentPet.x = currentPet.x + currentPet.velocityX;
-  currentPet.y = currentPet.y + currentPet.velocityY;
-
-  mainCanva.clearRect(0, 0, map.width, map.height);
-
-  mainCanva.drawImage(mapBackground, 0, 0, map.width, map.height);
-  currentPet.drawMokepon();
-  loadPetEnemy();
-}
-
-function loadPetEnemy() {
-  for (let i = 0; i < mokeponesEnemy.length; i++) {
-    mokeponesEnemy[i].drawMokepon();
-    if (currentPet.velocityX !== 0 || currentPet.velocityY !== 0) {
-      checkCollision(mokeponesEnemy[i]);
+function extractPetAttacks(petName) {
+  let attacks;
+  for (let i = 0; i < mokeponesPlayer.length; i++) {
+    if (petName === mokeponesPlayer[i].name) {
+      attacks = mokeponesPlayer[i].attacks;
     }
   }
+  return attacks;
 }
 
 function checkCollision(enemy) {
@@ -303,14 +191,12 @@ function checkCollision(enemy) {
   stopMove();
   keysPressed = [];
   clearInterval(interval);
+  enemyID = enemy.id;
+  console.log(enemyID);
   changeDisplay("select-attack", "flex");
   changeDisplay("see-map", "none");
-  selectPetEnemy(enemy);
-}
 
-function selectPetEnemy(enemy) {
   petEnemy.innerHTML = enemy.name;
-  attacksEnemy = extractPetAttacks(2, enemy.name);
 }
 
 function handleKeyDown(event) {
@@ -391,27 +277,65 @@ function diagonalDownRight() {
   currentPet.velocityY = 2;
 }
 
-function extractPetAttacks(type, petName) {
-  let attacks;
-  switch (type) {
-    case 1: {
-      for (let i = 0; i < mokeponesPlayer.length; i++) {
-        if (petName === mokeponesPlayer[i].name) {
-          attacks = mokeponesPlayer[i].attacks;
-        }
-      }
-      break;
-    }
-    case 2: {
-      for (let i = 0; i < mokeponesEnemy.length; i++) {
-        if (petName === mokeponesEnemy[i].name) {
-          attacks = mokeponesEnemy[i].attacks;
-        }
-      }
-      break;
-    }
+function loadPetPlayer() {
+  mokeponesPlayer.forEach((mokepon) => {
+    let mokeponOptions = `<input type="radio" name="pets" id="${mokepon.name}" />
+    <label class="card-mokepon" for="${mokepon.name}">
+      <p>${mokepon.name}</p>
+      <img src="${mokepon.photo}" alt="${mokepon.name}"/>
+    </label>`;
+    containerAvailablePets.innerHTML += mokeponOptions;
+  });
+}
+
+function selectPetPlayer() {
+  const petSelectedPlayer = petSelected();
+  if (petSelectedPlayer) {
+    petPlayer.innerHTML = petSelectedPlayer.name;
+    currentPet = petSelectedPlayer;
+    attacksPlayer = extractPetAttacks(petSelectedPlayer.name);
+
+    changeDisplay("select-pet", "none");
+    changeDisplay("see-map", "flex");
+    mokeponSelected(currentPet.name);
+
+    innitMap();
+
+    loadAttackPlayer();
+    playerAttackSequence();
+  } else {
+    alert("Error: No seleccionaste a tú mascota.");
   }
-  return attacks;
+}
+
+function loadPetEnemy() {
+  mokeponesEnemy.forEach(function (mokepon) {
+    mokepon.drawMokepon();
+    checkCollision(mokepon);
+  });
+}
+
+function innitMap() {
+  interval = setInterval(drawCanvas, 50);
+
+  document.addEventListener("keydown", handleKeyDown);
+
+  document.addEventListener("keyup", handleKeyUp);
+}
+
+function drawCanvas() {
+  currentPet.x = currentPet.x + currentPet.velocityX;
+  currentPet.y = currentPet.y + currentPet.velocityY;
+
+  mainCanva.clearRect(0, 0, map.width, map.height);
+
+  mainCanva.drawImage(mapBackground, 0, 0, map.width, map.height);
+  currentPet.drawMokepon();
+
+  sendPosition(currentPet.x, currentPet.y);
+  try {
+    loadPetEnemy();
+  } catch (error) {}
 }
 
 function loadAttackPlayer() {
@@ -442,34 +366,15 @@ function playerAttackSequence() {
         button.disabled = true;
         attackPlayer = "🌱";
       }
-      enemyAttackSequence();
-      startCombat();
+      if (sequenceAttackPlayer.length === 5) {
+        sendAttacks();
+      }
     });
   });
 }
 
-function enemyAttackSequence() {
-  sequenceAttackEnemy = [];
-  for (let i = 0; i < attacksEnemy.length; i++) {
-    sequenceAttackEnemy.push(attacksEnemy[i].name);
-  }
-
-  for (let i = sequenceAttackEnemy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [sequenceAttackEnemy[i], sequenceAttackEnemy[j]] = [
-      sequenceAttackEnemy[j],
-      sequenceAttackEnemy[i],
-    ];
-  }
-}
-
 function startCombat() {
-  if (sequenceAttackPlayer.length === 5) {
-    resultCombat();
-  }
-}
-
-function resultCombat() {
+  clearInterval(interval);
   for (let i = 0; i < sequenceAttackPlayer.length; i++) {
     generalConsole("console-player", sequenceAttackPlayer[i]);
     generalConsole("console-enemy", sequenceAttackEnemy[i]);
@@ -522,7 +427,7 @@ function validateResultWin() {
   }
 }
 
-function innitGame() {
+function initGame() {
   changeDisplay("select-attack", "none");
   changeDisplay("see-map", "none");
   changeDisplay("reset-game", "none");
@@ -533,6 +438,101 @@ function innitGame() {
   btnReset.addEventListener("click", () => {
     location.reload();
   });
+
+  joinGame();
 }
 
-window.addEventListener("load", innitGame);
+function joinGame() {
+  fetch("http://localhost:8080/unirse").then(function (res) {
+    if (res.ok) {
+      res.text().then(function (response) {
+        playerID = response;
+      });
+    }
+  });
+}
+
+function mokeponSelected(mokeponPlayer) {
+  fetch(`http://localhost:8080/mokepon/${playerID}`, {
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mokepon: mokeponPlayer }),
+  });
+}
+
+function sendPosition(x, y) {
+  fetch(`http://localhost:8080/mokepon/${playerID}/position`, {
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ x, y }),
+  }).then(function (res) {
+    if (res.ok) {
+      res.json().then(function ({ enemys }) {
+        mokeponesEnemy = enemys.map(function (enemy) {
+          let mokeponEnemy = null;
+          try {
+            const mokeponName = enemy.mokepon.name || "";
+            if (mokeponName === "Hipodoge") {
+              mokeponEnemy = new Mokepon(
+                "Hipodoge",
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_hipodoge_attack.png",
+                5,
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/hipodoge.png",
+                enemy.id
+              );
+            } else if (mokeponName === "Capipepo") {
+              mokeponEnemy = new Mokepon(
+                "Capipepo",
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_capipepo_attack.png",
+                5,
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/capipepo.png",
+                enemy.id
+              );
+            } else if (mokeponName === "Ratigueya") {
+              mokeponEnemy = new Mokepon(
+                "Ratigueya",
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-40-css-grid/programar/mokepon/assets/mokepons_mokepon_ratigueya_attack.png",
+                5,
+                "https://static.platzi.com/media/tmp/class-files/github/curso-programacion-basica/curso-programacion-basica-65-clases-methods/programar/mokepon/assets/ratigueya.png",
+                enemy.id
+              );
+            }
+            mokeponEnemy.x = enemy.x;
+            mokeponEnemy.y = enemy.y;
+            return mokeponEnemy;
+          } catch (error) {}
+        });
+      });
+    }
+  });
+}
+
+function sendAttacks() {
+  fetch(`http://localhost:8080/mokepon/${playerID}/attacks`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      attacks: sequenceAttackPlayer,
+    }),
+  });
+  interval = setInterval(getAttacks, 50);
+}
+
+function getAttacks() {
+  fetch(`http://localhost:8080/mokepon/${enemyID}/attacks`).then(function (
+    res
+  ) {
+    if (res.ok) {
+      res.json().then(function ({ attacks }) {
+        if (attacks.length === 5) {
+          sequenceAttackEnemy = attacks;
+          startCombat();
+        }
+      });
+    }
+  });
+}
+
+window.addEventListener("load", initGame);

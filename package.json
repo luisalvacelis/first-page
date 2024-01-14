@@ -1,0 +1,29 @@
+{
+  "name": "mokepon",
+  "version": "1.0.0",
+  "description": "![](https://img.shields.io/github/stars/luisalvacelis/first-page.svg) ![](https://img.shields.io/github/forks/luisalvacelis/first-page.svg) ![](https://img.shields.io/github/tag/luisalvacelis/first-page.svg) ![](https://img.shields.io/github/release/luisalvacelis/first-page.svg) ![](https://img.shields.io/github/issues/luisalvacelis/first-page.svg) ![](https://img.shields.io/bower/luisalvacelis/first-page.svg)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luisalvacelis/first-page.git"
+  },
+  "keywords": [
+    "mokepon",
+    "web",
+    "javascript",
+    "nodejs"
+  ],
+  "author": "Luis Alva Celis",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luisalvacelis/first-page/issues"
+  },
+  "homepage": "https://github.com/luisalvacelis/first-page#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
