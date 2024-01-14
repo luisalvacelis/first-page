@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mokepon</title>
-    <link rel="stylesheet" href="../css/styles.css" />
+    <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -25,11 +25,11 @@
       <section id="see-map" class="see-map">
         <h2 class="sub-title">Recorre el mapa con tu mokepon</h2>
         <canvas id="map"> </canvas>
-        <button onmousedown="moveUp();">W</button>
+        <button onmousedown="moveUp();" onmouseup="stopMove();">W</button>
         <div class="container-btn-move">
-          <button onmousedown="moveLeft();">A</button>
-          <button onmousedown="moveDown();">S</button>
-          <button onmousedown="moveRight();">D</button>
+          <button onmousedown="moveLeft();" onmouseup="stopMove();">A</button>
+          <button onmousedown="moveDown();" onmouseup="stopMove();">S</button>
+          <button onmousedown="moveRight();" onmouseup="stopMove();">D</button>
         </div>
       </section>
 
@@ -62,6 +62,6 @@
         </div>
       </section>
     </div>
-    <script src="../js/mokepon.js"></script>
+    <script src="mokepon.js"></script>
   </body>
 </html>

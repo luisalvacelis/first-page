@@ -121,13 +121,6 @@ hipodoge.attacks.push(...HIPODOGE_ATTACKS);
 
 mokeponesPlayer.push(hipodoge, capipepo, ratigueya);
 
-function changeDisplay(label, status) {
-  var element = document.getElementById(label);
-  if (element) {
-    element.style.display = status;
-  }
-}
-
 function desactiveAllButtonAttack() {
   btnAttacks.forEach((button) => {
     button.disabled = true;
@@ -150,15 +143,6 @@ function random(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
-function petSelected() {
-  const selectedPetInput = document.querySelector('input[name="pets"]:checked');
-  if (selectedPetInput) {
-    return mokeponesPlayer.find(
-      (mokepon) => mokepon.name === selectedPetInput.id
-    );
-  }
-}
-
 function extractPetAttacks(petName) {
   let attacks;
   for (let i = 0; i < mokeponesPlayer.length; i++) {
@@ -167,73 +151,6 @@ function extractPetAttacks(petName) {
     }
   }
   return attacks;
-}
-
-function checkCollision(enemy) {
-  const upPetEnemy = enemy.y;
-  const downPetEnemy = enemy.y + enemy.height;
-  const rightPetEnemy = enemy.x + enemy.width;
-  const leftPetEnemy = enemy.x;
-
-  const upPetPlayer = currentPet.y;
-  const downPetPlayer = currentPet.y + currentPet.height;
-  const rightPetPlayer = currentPet.x + currentPet.width;
-  const leftPetPlayer = currentPet.x;
-
-  if (
-    downPetPlayer < upPetEnemy ||
-    upPetPlayer > downPetEnemy ||
-    rightPetPlayer < leftPetEnemy ||
-    leftPetPlayer > rightPetEnemy
-  ) {
-    return;
-  }
-  stopMove();
-  keysPressed = [];
-  clearInterval(interval);
-  enemyID = enemy.id;
-  console.log(enemyID);
-  changeDisplay("select-attack", "flex");
-  changeDisplay("see-map", "none");
-
-  petEnemy.innerHTML = enemy.name;
-}
-
-function handleKeyDown(event) {
-  keysPressed[event.key] = true;
-  if (currentPet) {
-    if (keysPressed["a"]) {
-      moveLeft();
-    }
-    if (keysPressed["d"]) {
-      moveRight();
-    }
-    if (keysPressed["w"]) {
-      moveUp();
-    }
-    if (keysPressed["s"]) {
-      moveDown();
-    }
-    if (keysPressed["w"] && keysPressed["d"]) {
-      diagonalTopRight();
-    }
-    if (keysPressed["w"] && keysPressed["a"]) {
-      diagonalTopLeft();
-    }
-    if (keysPressed["s"] && keysPressed["d"]) {
-      diagonalDownRight();
-    }
-    if (keysPressed["s"] && keysPressed["a"]) {
-      diagonalDownLeft();
-    }
-  }
-}
-
-function handleKeyUp(event) {
-  if (currentPet) {
-    keysPressed[event.key] = false;
-    stopMove();
-  }
 }
 
 function stopMove() {
@@ -275,67 +192,6 @@ function diagonalDownLeft() {
 function diagonalDownRight() {
   currentPet.velocityX = 2;
   currentPet.velocityY = 2;
-}
-
-function loadPetPlayer() {
-  mokeponesPlayer.forEach((mokepon) => {
-    let mokeponOptions = `<input type="radio" name="pets" id="${mokepon.name}" />
-    <label class="card-mokepon" for="${mokepon.name}">
-      <p>${mokepon.name}</p>
-      <img src="${mokepon.photo}" alt="${mokepon.name}"/>
-    </label>`;
-    containerAvailablePets.innerHTML += mokeponOptions;
-  });
-}
-
-function selectPetPlayer() {
-  const petSelectedPlayer = petSelected();
-  if (petSelectedPlayer) {
-    petPlayer.innerHTML = petSelectedPlayer.name;
-    currentPet = petSelectedPlayer;
-    attacksPlayer = extractPetAttacks(petSelectedPlayer.name);
-
-    changeDisplay("select-pet", "none");
-    changeDisplay("see-map", "flex");
-    mokeponSelected(currentPet.name);
-
-    innitMap();
-
-    loadAttackPlayer();
-    playerAttackSequence();
-  } else {
-    alert("Error: No seleccionaste a tú mascota.");
-  }
-}
-
-function loadPetEnemy() {
-  mokeponesEnemy.forEach(function (mokepon) {
-    mokepon.drawMokepon();
-    checkCollision(mokepon);
-  });
-}
-
-function innitMap() {
-  interval = setInterval(drawCanvas, 50);
-
-  document.addEventListener("keydown", handleKeyDown);
-
-  document.addEventListener("keyup", handleKeyUp);
-}
-
-function drawCanvas() {
-  currentPet.x = currentPet.x + currentPet.velocityX;
-  currentPet.y = currentPet.y + currentPet.velocityY;
-
-  mainCanva.clearRect(0, 0, map.width, map.height);
-
-  mainCanva.drawImage(mapBackground, 0, 0, map.width, map.height);
-  currentPet.drawMokepon();
-
-  sendPosition(currentPet.x, currentPet.y);
-  try {
-    loadPetEnemy();
-  } catch (error) {}
 }
 
 function loadAttackPlayer() {
@@ -427,10 +283,49 @@ function validateResultWin() {
   }
 }
 
+function mokeponSelected(mokeponPlayer) {
+  fetch(`http://192.168.0.7:8080/mokepon/${playerID}`, {
+    method: "post",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mokepon: mokeponPlayer }),
+  });
+}
+
+function sendAttacks() {
+  fetch(`http://192.168.0.7:8080/mokepon/${playerID}/attacks`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      attacks: sequenceAttackPlayer,
+    }),
+  });
+  interval = setInterval(getAttacks, 50);
+}
+
+function getAttacks() {
+  fetch(`http://192.168.0.7:8080/mokepon/${enemyID}/attacks`).then(function (
+    res
+  ) {
+    if (res.ok) {
+      res.json().then(function ({ attacks }) {
+        if (attacks.length === 5) {
+          sequenceAttackEnemy = attacks;
+          startCombat();
+        }
+      });
+    }
+  });
+}
+
+window.addEventListener("load", initGame);
+
 function initGame() {
   changeDisplay("select-attack", "none");
   changeDisplay("see-map", "none");
   changeDisplay("reset-game", "none");
+
   loadPetPlayer();
 
   btnPetPlayer.addEventListener("click", selectPetPlayer);
@@ -442,29 +337,131 @@ function initGame() {
   joinGame();
 }
 
+function changeDisplay(label, status) {
+  var element = document.getElementById(label);
+  if (element) {
+    element.style.display = status;
+  }
+}
+
+function loadPetPlayer() {
+  mokeponesPlayer.forEach((mokepon) => {
+    let mokeponOptions = `<input type="radio" name="pets" id="${mokepon.name}" />
+    <label class="card-mokepon" for="${mokepon.name}">
+      <p>${mokepon.name}</p>
+      <img src="${mokepon.photo}" alt="${mokepon.name}"/>
+    </label>`;
+    containerAvailablePets.innerHTML += mokeponOptions;
+  });
+}
+
+function selectPetPlayer() {
+  const petSelectedPlayer = petSelected();
+  if (petSelectedPlayer) {
+    petPlayer.innerHTML = petSelectedPlayer.name;
+    currentPet = petSelectedPlayer;
+    attacksPlayer = extractPetAttacks(petSelectedPlayer.name);
+
+    changeDisplay("select-pet", "none");
+    changeDisplay("see-map", "flex");
+    mokeponSelected(currentPet.name);
+
+    innitMap();
+
+    loadAttackPlayer();
+    playerAttackSequence();
+  } else {
+    alert("Error: No seleccionaste a tú mascota.");
+  }
+}
+
 function joinGame() {
-  fetch("http://localhost:8080/unirse").then(function (res) {
+  fetch("http://192.168.0.7:8080/unirse").then((res) => {
     if (res.ok) {
-      res.text().then(function (response) {
+      res.text().then((response) => {
         playerID = response;
       });
     }
   });
 }
 
-function mokeponSelected(mokeponPlayer) {
-  fetch(`http://localhost:8080/mokepon/${playerID}`, {
-    method: "post",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ mokepon: mokeponPlayer }),
-  });
+function petSelected() {
+  const selectedPetInput = document.querySelector('input[name="pets"]:checked');
+  if (selectedPetInput) {
+    return mokeponesPlayer.find(
+      (mokepon) => mokepon.name === selectedPetInput.id
+    );
+  }
+}
+
+function innitMap() {
+  interval = setInterval(drawCanvas, 50);
+
+  document.addEventListener("keydown", handleKeyDown);
+
+  document.addEventListener("keyup", handleKeyUp);
+}
+
+function drawCanvas() {
+  currentPet.x = currentPet.x + currentPet.velocityX;
+  currentPet.y = currentPet.y + currentPet.velocityY;
+
+  mainCanva.clearRect(0, 0, map.width, map.height);
+
+  mainCanva.drawImage(mapBackground, 0, 0, map.width, map.height);
+  currentPet.drawMokepon();
+
+  sendPosition(currentPet.x, currentPet.y);
+  try {
+    loadPetEnemy();
+  } catch (error) {}
+}
+
+function handleKeyDown(event) {
+  keysPressed[event.key] = true;
+  if (currentPet) {
+    if (keysPressed["a"]) {
+      moveLeft();
+    }
+    if (keysPressed["d"]) {
+      moveRight();
+    }
+    if (keysPressed["w"]) {
+      moveUp();
+    }
+    if (keysPressed["s"]) {
+      moveDown();
+    }
+    if (keysPressed["w"] && keysPressed["d"]) {
+      diagonalTopRight();
+    }
+    if (keysPressed["w"] && keysPressed["a"]) {
+      diagonalTopLeft();
+    }
+    if (keysPressed["s"] && keysPressed["d"]) {
+      diagonalDownRight();
+    }
+    if (keysPressed["s"] && keysPressed["a"]) {
+      diagonalDownLeft();
+    }
+  }
+}
+
+function handleKeyUp(event) {
+  if (currentPet) {
+    keysPressed[event.key] = false;
+    stopMove();
+  }
 }
 
 function sendPosition(x, y) {
-  fetch(`http://localhost:8080/mokepon/${playerID}/position`, {
+  fetch(`http://192.168.0.7:8080/mokepon/${playerID}/position`, {
     method: "post",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ x, y }),
+    body: JSON.stringify({
+      x,
+      y,
+    }),
   }).then(function (res) {
     if (res.ok) {
       res.json().then(function ({ enemys }) {
@@ -497,8 +494,8 @@ function sendPosition(x, y) {
                 enemy.id
               );
             }
-            mokeponEnemy.x = enemy.x;
-            mokeponEnemy.y = enemy.y;
+            mokeponEnemy.x = enemy.x || 0;
+            mokeponEnemy.y = enemy.y || 0;
             return mokeponEnemy;
           } catch (error) {}
         });
@@ -507,32 +504,42 @@ function sendPosition(x, y) {
   });
 }
 
-function sendAttacks() {
-  fetch(`http://localhost:8080/mokepon/${playerID}/attacks`, {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      attacks: sequenceAttackPlayer,
-    }),
+function loadPetEnemy() {
+  mokeponesEnemy.forEach(function (mokepon) {
+    mokepon.drawMokepon();
+    checkCollision(mokepon);
   });
-  interval = setInterval(getAttacks, 50);
 }
 
-function getAttacks() {
-  fetch(`http://localhost:8080/mokepon/${enemyID}/attacks`).then(function (
-    res
+function checkCollision(enemy) {
+  const upPetEnemy = enemy.y;
+  const downPetEnemy = enemy.y + enemy.height;
+  const rightPetEnemy = enemy.x + enemy.width;
+  const leftPetEnemy = enemy.x;
+
+  const upPetPlayer = currentPet.y;
+  const downPetPlayer = currentPet.y + currentPet.height;
+  const rightPetPlayer = currentPet.x + currentPet.width;
+  const leftPetPlayer = currentPet.x;
+
+  if (
+    downPetPlayer < upPetEnemy ||
+    upPetPlayer > downPetEnemy ||
+    rightPetPlayer < leftPetEnemy ||
+    leftPetPlayer > rightPetEnemy
   ) {
-    if (res.ok) {
-      res.json().then(function ({ attacks }) {
-        if (attacks.length === 5) {
-          sequenceAttackEnemy = attacks;
-          startCombat();
-        }
-      });
-    }
-  });
+    return;
+  }
+  stopMove();
+  keysPressed = [];
+  clearInterval(interval);
+  enemyID = enemy.id;
+  changeDisplay("select-attack", "flex");
+  changeDisplay("see-map", "none");
+
+  selectPetEnemy(enemy);
 }
 
-window.addEventListener("load", initGame);
+function selectPetEnemy(enemy) {
+  petEnemy.innerHTML = enemy.name;
+}

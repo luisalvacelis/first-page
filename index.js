@@ -3,6 +3,10 @@ const cors = require("cors");
 const app = express();
 const players = [];
 
+app.use(express.static("public"));
+app.use(cors());
+app.use(express.json());
+
 class Player {
   constructor(id) {
     this.id = id;
@@ -24,9 +28,6 @@ class Mokepon {
     this.name = name;
   }
 }
-
-app.use(cors());
-app.use(express.json());
 
 app.get("/unirse", (req, res) => {
   const id = `${Math.random()}`;
